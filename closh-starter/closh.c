@@ -27,15 +27,44 @@ char readChar() {
     return c;
 }
 
-void parallel(char** cmdTokens, int count){
+void parallel(char** cmdTokens, int count, int timeout){
 
+    int[] cid = new int[count];
+    for(int i= 0; i < count; i++){
+        printf("  P%i: ", i);
+        cid[i] = fork();
+        switch(cid[i]){
+            case 0:
+                //child
+                exec(cmdTokens);
+                exit(0);
+            case -1:
+                //fork failed
+                exit(1);
+            default:
+                //parent
+                sleep(timeout);
+                kill(cid[i]);
+                printf("P%i timed out", i);
+                exit(0);
+
+        }
+    }
 }
 
-void sequential(char** cmdTokens, int count){
+void sequential(char** cmdTokens, int count, int timeout){
     //run exec count number of times
     for(int i = 0; i < count; i++){
         printf("  P%i: ", i);
-        exec(cmdTokens);
+        int cid = fork();
+        if(cid == 0){
+            exec(cmdTokens);
+            exit(0);
+        }else{
+            sleep(timeout);
+            kill(cid);
+            printf("P%i timed out", i);
+        }
     }
 }
 void exec(char** cmdTokens){
@@ -84,10 +113,10 @@ int main() {
 
 
         if(parallel == 'p'){
-            parallel(cmdTokens, count);
+            parallel(cmdTokens, count, timeout);
         }
         else{
-            sequential(cmdTokens, count);
+            sequential(cmdTokens, count, timeout);
         }
         
         // just executes the given command once - REPLACE THIS CODE WITH YOUR OWN
