@@ -29,7 +29,7 @@ char readChar() {
 
 int parallel(char** cmdTokens, int count, int timeout){
 
-    int cid = new int[count];
+    int cid[count];
     for(int i= 0; i < count; i++){
         printf("  P%i: ", i);
         cid[i] = fork();
