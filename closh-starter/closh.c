@@ -27,9 +27,9 @@ char readChar() {
     return c;
 }
 
-void parallel(char** cmdTokens, int count, int timeout){
+int parallel(char** cmdTokens, int count, int timeout){
 
-    int[] cid = new int[count];
+    int cid = new int[count];
     for(int i= 0; i < count; i++){
         printf("  P%i: ", i);
         cid[i] = fork();
@@ -44,7 +44,7 @@ void parallel(char** cmdTokens, int count, int timeout){
             default:
                 //parent
                 sleep(timeout);
-                kill(cid[i]);
+                kill(cid[i], SIGKILL);
                 printf("P%i timed out", i);
                 exit(0);
 
@@ -52,7 +52,7 @@ void parallel(char** cmdTokens, int count, int timeout){
     }
 }
 
-void sequential(char** cmdTokens, int count, int timeout){
+int sequential(char** cmdTokens, int count, int timeout){
     //run exec count number of times
     for(int i = 0; i < count; i++){
         printf("  P%i: ", i);
@@ -62,12 +62,12 @@ void sequential(char** cmdTokens, int count, int timeout){
             exit(0);
         }else{
             sleep(timeout);
-            kill(cid);
+            kill(cid, SIGKILL);
             printf("P%i timed out", i);
         }
     }
 }
-void exec(char** cmdTokens){
+int exec(char** cmdTokens){
     execvp(cmdTokens[0], cmdTokens); // replaces the current process with the given program
     // doesn't return unless the calling failed
     printf("Can't execute %s\n", cmdTokens[0]); // only reached if running the program failed
