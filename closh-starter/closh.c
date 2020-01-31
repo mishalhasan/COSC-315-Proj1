@@ -27,6 +27,25 @@ char readChar() {
     return c;
 }
 
+void parallel(char** cmdTokens, int count){
+
+}
+
+void sequential(char** cmdTokens, int count){
+    //run exec count number of times
+    for(int i = 0; i < count; i++){
+        printf("  P%i: ", i);
+        exec(cmdTokens);
+    }
+}
+void exec(char** cmdTokens){
+    execvp(cmdTokens[0], cmdTokens); // replaces the current process with the given program
+    // doesn't return unless the calling failed
+    printf("Can't execute %s\n", cmdTokens[0]); // only reached if running the program failed
+    exit(1); 
+}
+
+
 // main method - program entry point
 int main() {
     char cmd[81]; // array of chars (a string)
@@ -62,6 +81,14 @@ int main() {
         // to implement the rest of closh                     //
         //                                                    //
         // /////////////////////////////////////////////////////
+
+
+        if(parallel == 'p'){
+            parallel(cmdTokens, count);
+        }
+        else{
+            sequential(cmdTokens, count);
+        }
         
         // just executes the given command once - REPLACE THIS CODE WITH YOUR OWN
         execvp(cmdTokens[0], cmdTokens); // replaces the current process with the given program
