@@ -30,7 +30,7 @@ char readChar() {
 int run_parallel(char** cmdTokens, int count, int timeout){
 
     int cid[count];
-    for(int i= 0; i < count; i++){
+    for(int i = 0; i < count; i++){
         printf("  P%i: ", i);
         cid[i] = fork();
         switch(cid[i]){
@@ -45,8 +45,9 @@ int run_parallel(char** cmdTokens, int count, int timeout){
                 //parent
                 if(timeout != 0){
                     sleep(timeout);
-                    kill(cid[i], SIGKILL);
-                    printf("P%i timed out", i);
+                    if(0 == kill(cid, SIGKILL)){
+                        printf("P%i timed out", i);
+                    }   
                     exit(0);
                 }
         }
@@ -64,8 +65,9 @@ int run_sequential(char** cmdTokens, int count, int timeout){
         }else{//parent - sleep for timeout, then kill child if not exited
             if(timeout !=0){
                 sleep(timeout);
-                kill(cid, SIGKILL);
-                printf("P%i timed out", i);
+                if(0 == kill(cid, SIGKILL)){
+                    printf("P%i timed out", i);
+                }                
             }
         }
     }
@@ -120,13 +122,7 @@ int main() {
         }
         else{
             run_sequential(cmdTokens, count, timeout);
-        }
-        
-        // just executes the given command once - REPLACE THIS CODE WITH YOUR OWN
-        execvp(cmdTokens[0], cmdTokens); // replaces the current process with the given program
-        // doesn't return unless the calling failed
-        printf("Can't execute %s\n", cmdTokens[0]); // only reached if running the program failed
-        exit(1);        
+        }       
     }
 }
 
