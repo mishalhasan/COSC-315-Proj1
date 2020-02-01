@@ -31,7 +31,7 @@ int run_parallel(char** cmdTokens, int count, int timeout){
 
     int cid[count];
     for(int i = 0; i < count; i++){
-        printf("  P%i: ", i);
+        printf("P%i:\n", i);
         cid[i] = fork();
         switch(cid[i]){
             case 0:
@@ -46,10 +46,10 @@ int run_parallel(char** cmdTokens, int count, int timeout){
                 if(timeout != 0){
                     sleep(timeout);
                     if(0 == kill(cid, SIGKILL)){
-                        printf("P%i timed out", i);
+                        printf("P%i timed out\n", i);
                     }   
-                    exit(0);
                 }
+                exit(0);
         }
     }
 }
@@ -57,7 +57,7 @@ int run_parallel(char** cmdTokens, int count, int timeout){
 int run_sequential(char** cmdTokens, int count, int timeout){
     //run exec count number of times
     for(int i = 0; i < count; i++){
-        printf("  P%i: ", i);
+        printf("P%i:\n", i);
         int cid = fork();
         if(cid == 0){//child - run program, then exit
             exec(cmdTokens);
@@ -66,7 +66,7 @@ int run_sequential(char** cmdTokens, int count, int timeout){
             if(timeout !=0){
                 sleep(timeout);
                 if(0 == kill(cid, SIGKILL)){
-                    printf("P%i timed out", i);
+                    printf("P%i timed out\n", i);
                 }                
             }
         }
