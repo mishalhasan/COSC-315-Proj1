@@ -45,9 +45,10 @@ int run_parallel(char** cmdTokens, int count, int timeout){
                 //parent
                 if(timeout != 0){
                     sleep(timeout);
+                    //if child is still active, kill and exit
                     if(0 == kill(cid, SIGKILL)){
                         printf("P%i timed out\n", i);
-                    }   
+                    }//otherwise just exit 
                 }
                 exit(0);
         }
@@ -65,9 +66,10 @@ int run_sequential(char** cmdTokens, int count, int timeout){
         }else{//parent - sleep for timeout, then kill child if not exited
             if(timeout !=0){
                 sleep(timeout);
+                //if child is still active, kill and exit
                 if(0 == kill(cid, SIGKILL)){
                     printf("P%i timed out\n", i);
-                }                
+                }//otherwise just exit            
             }
         }
     }
