@@ -27,7 +27,7 @@ char readChar() {
     return c;
 }
 
-int run_parallel(char** cmdTokens, int count, int timeout){
+int run_parallel(char** cmdTokens, int count){
 
     int cid[count];
     for(int i = 0; i < count; i++){
@@ -43,15 +43,12 @@ int run_parallel(char** cmdTokens, int count, int timeout){
                 exit(1);
             default:
                 //parent
-                if(timeout != 0){
-                    sleep(timeout);
-                }
                 exit(0);
         }
     }
 }
 
-int run_sequential(char** cmdTokens, int count, int timeout){
+int run_sequential(char** cmdTokens, int count){
     //run exec count number of times
     for(int i = 0; i < count; i++){
         int cid = fork();
@@ -59,10 +56,6 @@ int run_sequential(char** cmdTokens, int count, int timeout){
             printf("PID: %i\n", getpid());
             exec(cmdTokens);
             exit(0);
-        }else{//parent - sleep for timeout, then kill child if not exited
-            if(timeout !=0){
-                sleep(timeout);          
-            }
         }
     }
 }
@@ -81,8 +74,9 @@ int main() {
     int count; // number of times to execute command
     int parallel; // whether to run in parallel or sequentially
     int timeout; // max seconds to run set of commands (parallel) or each command (sequentially)
+    int run = 1;
     
-    while (TRUE) { // main shell input loop
+    while (run == 1) { // main shell input loop
         
         // begin parsing code - do not modify
         printf("closh> ");
@@ -112,11 +106,14 @@ int main() {
 
 
         if(parallel == 'p'){
-            run_parallel(cmdTokens, count, timeout);
+            run_parallel(cmdTokens, count);
+            run = 0;
         }
         else{
-            run_sequential(cmdTokens, count, timeout);
-        }       
+            run_sequential(cmdTokens, count);
+            run = 0;
+        }
+
     }
 }
 
