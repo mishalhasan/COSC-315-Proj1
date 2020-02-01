@@ -1,4 +1,4 @@
-// closh.c - COSC 315, Winter 2020
+ // closh.c - COSC 315, Winter 2020
 // YOUR NAME HERE
 
 #include <stdio.h>
@@ -31,11 +31,11 @@ int run_parallel(char** cmdTokens, int count, int timeout){
 
     int cid[count];
     for(int i = 0; i < count; i++){
-        printf("P%i:\n", i);
         cid[i] = fork();
         switch(cid[i]){
             case 0:
                 //child
+                printf("PID: %i\n", getpid());
                 exec(cmdTokens);
                 exit(0);
             case -1:
@@ -45,10 +45,6 @@ int run_parallel(char** cmdTokens, int count, int timeout){
                 //parent
                 if(timeout != 0){
                     sleep(timeout);
-                    //if child is still active, kill and exit
-                    if(0 == kill(cid, SIGKILL)){
-                        printf("P%i timed out\n", i);
-                    }//otherwise just exit 
                 }
                 exit(0);
         }
@@ -58,18 +54,14 @@ int run_parallel(char** cmdTokens, int count, int timeout){
 int run_sequential(char** cmdTokens, int count, int timeout){
     //run exec count number of times
     for(int i = 0; i < count; i++){
-        printf("P%i:\n", i);
         int cid = fork();
         if(cid == 0){//child - run program, then exit
+            printf("PID: %i\n", getpid());
             exec(cmdTokens);
             exit(0);
         }else{//parent - sleep for timeout, then kill child if not exited
             if(timeout !=0){
-                sleep(timeout);
-                //if child is still active, kill and exit
-                if(0 == kill(cid, SIGKILL)){
-                    printf("P%i timed out\n", i);
-                }//otherwise just exit            
+                sleep(timeout);          
             }
         }
     }
