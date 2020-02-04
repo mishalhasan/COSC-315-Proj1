@@ -41,13 +41,9 @@ int run_parallel(char** cmdTokens, int count){
             case -1:
                 //fork failed
                 exit(1);
-            default:
-                for(int j = 0; j < sizeof(cid); j++){
-                    waitpid(cid[j], 0, 0);
-                }
         }
     }
-    exit(0);
+
 }
 
 int run_sequential(char** cmdTokens, int count){
@@ -58,8 +54,11 @@ int run_sequential(char** cmdTokens, int count){
             printf("PID: %i\n", getpid());
             exec(cmdTokens);
             exit(0);
+        }else{
+            waitpid(cid,0,0);
         }
     }
+    return(0);
 }
 int exec(char** cmdTokens){
     execvp(cmdTokens[0], cmdTokens); // replaces the current process with the given program
@@ -106,7 +105,7 @@ int main() {
         // /////////////////////////////////////////////////////
 
 
-        if(parallel == 'p'){
+        if(parallel == TRUE){
             run_parallel(cmdTokens, count);
         }
         else{
